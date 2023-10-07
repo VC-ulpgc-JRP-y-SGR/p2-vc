@@ -200,6 +200,57 @@ Ambos resultados obtenidos son diferentes aunque es cierto que en la detección 
 ## Tarea 4:
 #### Asumiendo que quieren mostrar a personas que no forman parte del curso de VC el comportamiento de una o varias fuciones de las vistas hasta este momento aplicadas sobre la entrada de la webcam. ¿Cuál(es) escogerían?
 
+Se ha escogido usar el filtro de Sobel para detectar los bordes de las imágenes. Para mostrar su funcionamiento, se ha decidido capturar las imágenes que muestra la cámara y aplicar en cada frame el filtro, aplicando un valor de umbral aleatorio, de forma que parece da una sensación de "dibujo" en el filtro.
+
+Empezamos capturando las imágenes de la cámara y leyéndolas.
+
+```python
+import random 
+
+cam = cv2.VideoCapture(0)
+
+while True:
+    ret, image = cam.read()
+```
+
+Como vamos a usar Sobel con el método Canny, aplicamos a la imagen capturada un filtro Gaussiano para suavizar la imagen y, con un número aleatorio de umbral entre 30 y 50, aplicamos el método de Canny para detectar los bordes y lo combinamos en una misma imagen, convirtiéndo la imagen de magnitud del gradiente a un formato de 8 bits.
+
+```python
+    smoothed_image = cv2.GaussianBlur(image, (5, 5), 0)
+
+    r = random.randint(30, 50)
+    # Apply Sobel edge detection
+    sobel_x = cv2.Canny(smoothed_image, 0, r)
+    sobel_y = cv2.Canny(smoothed_image, 0, r)
+
+    # Calculate the magnitude of the gradient
+    sobel_magnitude = cv2.add(sobel_x, sobel_y)
+
+    # Convert the magnitude image to 8-bit
+    sobel_magnitude = np.uint8(sobel_magnitude)
+```
+
+Tras esto, se aplica un umbral a la imagen de magnitud del gradiente para obtener una imagen binaria, donde los píxeles por encima del umbral se establecen a 255 (blanco) y los píxeles por debajo del umbral se establecen a 0 (negro).
+
+```python
+    # Define a threshold value
+    threshold_value = 0
+
+    # Threshold the Sobel magnitude image
+    _, thresholded_image = cv2.threshold(sobel_magnitude, threshold_value, 255, cv2.THRESH_BINARY)
+```
+
+Por último, mostramos la imagen.
+
+```python
+    cv2.imshow("SKETCHY", thresholded_image)
+
+    if cv2.waitKey(20) == 27:
+        break
+
+cam.release()
+cv2.destroyAllWindows()
+```
 
 ## Tarea 5:
 #### Tras ver los vídeos [My little piece of privacy](https://www.niklasroy.com/project/88/my-little-piece-of-privacy), [Messa di voce](https://youtu.be/GfoqiyB1ndE?feature=shared) y [Virtual air guitar](https://youtu.be/FIAmyoEpV5c?feature=shared) propongan (los componentes de cada grupo) una reinterpretación del procesamiento de imágenes con las técnicas vistas o que conozcan.
