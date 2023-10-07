@@ -38,6 +38,31 @@ Un problema de este acercamiento es que cada vez que ejecutemos el código al no
 
 ##### Método 2: Modificar los parámetros de reduce
 
+Un segundo método para obtener este resultado sin tener el problema de la rotación de la imagen, es cambiando los parámetros del método reduce, indicando que reduzca en filas con el segundo parámetro (cambiándolo a un 1).
+
+```python
+    row_counts = cv2.reduce(image, 1, cv2.REDUCE_SUM, dtype=cv2.CV_32SC1)
+    rows = row_counts / (255 * canny.shape[0])
+```
+
+A partir de aqui, simplemente mostramos el histogramos.
+
+```python
+    # Muestra dicha cuenta gráficamente
+    plt.figure()
+    plt.subplot(1, 3, 1)
+    plt.axis("off")
+    plt.title("Imagen")
+    plt.imshow(image, cmap='gray') 
+
+    plt.subplot(1, 2, 2)
+    plt.title("Histograma horizontal")
+    plt.xlabel("Filas")
+    plt.ylabel("% píxeles")
+    plt.plot(rows)
+    # Rango en x definido por las columnas
+    plt.xlim([0, image.shape[0]])
+```
 
 ## Tarea 2
 #### Elige otra imagen, muestra el contenido de alguna de las imágenes resultado de Sobel antes y después de ajustar la escala
